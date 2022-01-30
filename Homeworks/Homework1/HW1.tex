@@ -201,7 +201,6 @@ w_init = w
 
 # GDA
 def steepest_decent(t, X, w, eta):
-	# print(w.shape, (X.T@(t-X@w)).shape)
 	if type(eta) is np.ndarray:
 		return w + eta@(X.T@(t-X@w))
 	else:
