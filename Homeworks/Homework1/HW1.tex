@@ -75,9 +75,102 @@ Using substituting the optimal $\eta$ in update equation we get,\\
 \implies \overline{w}_{new} = w^{*}
 \end{gather*}
 So theoritically only one iteration is sufficient with optimal eta to make the solution to converge to optimal weights.\\
-Now implementing the steepest-descent algorithm in python to verify number of iteration taken to converge.
+The implementation of this algorithm is given here Appendix \ref{code:hw1}. The data generated here is just the equation
+\begin{equation*}
+	t = 3.879x - 65
+\end{equation*}
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{./figs/datapoints.png}
+	\caption{Data points}
+	\label{fig:dp}
+\end{figure}
+\begin{figure}[H]
+	\includegraphics[scale=1]{./figs/3d.png}
+	\caption{Error surface with path of steepest descent algorithm.}
+	\label{fig:error}
+\end{figure}
+Observe that in Figure \ref{fig:error}, it took only 1 iteration to converge to the desired solution, this has been proved mathematically as well.
+\begin{figure}[H]
+	\includegraphics[scale=0.38]{./figs/op.png}
+	\caption{Output}
+	\label{fig:op}
+\end{figure}
+\section*{\hfil HW-2}
+Suppose you are experimenting with L1 and L2 regularization. Further imagine that you are running gradient descent and at some iteration your weight vector is $\overline{w}$ = [1, $\epsilon$] $\in$ $R^2$ where $\epsilon > 0$ is very small. With the help of this example explain why L2 norm does not encourage sparsity i.e., it will not try to drive $\epsilon$ to 0 to produce a sparse weight vector. Give mathematical explanation.
+\newline
+\newline
 
-\begin{lstlisting}[language=python]
+%Let after GDA we observe that change in weight vector is $\Delta \overline{w} = \begin{bmatrix}\Delta w_1 & \Delta w_2 \end{bmatrix} ^T$. Then $\overline{w} = \begin{bmatrix} 1-\Delta w_1 & \epsilon-\Delta w_2 \end{bmatrix} ^T$
+%Take Case (i) where $\Delta w_1 > \Delta w_2$,\\
+%\begin{gather*}
+%J_{L1_{(i)}}(\overline{w}) = J(\overline{w}) + \lambda \left(1- \Delta w_1 + \epsilon - \Delta w_2\right)\\
+%J_{L2_{(i)}}(\overline{w}) = J(\overline{w}) + \lambda \left(1 - 2{\Delta w_1} + (\Delta w_1)^2 + {\epsilon}^2 - 2{\epsilon \Delta w_2} + (\Delta w_2)^2\right)
+%\end{gather*}
+%Another case (i) where $\Delta w_1 < \Delta w_2$,\\
+Since $\overline{w} = \begin{bmatrix} 1 & \epsilon \end{bmatrix}^T$ and $\epsilon > 0$.\\
+\begin{gather*}
+L_1(\overline{w}) = ||\overline{w}||_1 \implies \frac{\delta L_1{\overline{w}}}{\delta \overline{w}} = \begin{bmatrix} sgn(w_1) & sgn(w_2) \end{bmatrix} = \begin{bmatrix} 1 & 1 \end{bmatrix}\\
+L_2(\overline{w}) = \frac{1}{2}||\overline{w}||^{2}_{2} \implies \frac{\delta L_2{\overline{w}}}{\delta \overline{w}} = \overline{w}^T
+\end{gather*}
+By applying GDA on this we get, for brevity we are ignoring the MSE cost since it is a common term for both
+\begin{gather*}
+\overline{w}_{L1} = \begin{bmatrix}
+1 - {\eta}{\lambda} \\
+\epsilon - {\eta}{\lambda}
+\end{bmatrix}\\
+\overline{w}_{L2} = (1 - {\eta}{\lambda}) \begin{bmatrix}
+1 \\
+\epsilon
+\end{bmatrix}
+\end{gather*}
+Since $\epsilon$ is very small and it is most likely to tend to zero than 1 in L1 regulatisation but where as in the case of L2 we see that both dimensions are equally scaled and also it's gradient depends upon current weights. In L1 even if second diemension is negative the gradients are -1 and it tries to bring it to zero. But in the case L2 it just scale down the weights.\\
+ Thus we can say that L2 norm does'nt encourage sparsity compared to L1.
+\section*{\hfil HW-3}
+Till now we have been considering a scalar target t from a vector of input observations $\overline{x}$. How do you extend this approach for regressing a vector of targets $\overline{t} = (t1, t2, ..., tp)$. Derive the close form solutions and write sequential update equations using SGD.
+\begin{table}[H]
+\begin{tabular}{||c|c||}
+\hline
+Variable & Dimension \\
+\hline
+$\mathbf{T}$ & N X P \\
+\hline
+$\mathbf{X}$ & N X (D+1) \\
+\hline
+$\mathbf{W}$ & (D+1) X P \\
+\hline
+$\mathbf{E}$ & N X P\\
+\hline
+\end{tabular}
+\end{table}
+
+Where N is number of examples, P is output vector dimension and D is input vector dimension.\\
+\newline 
+Taking our cost function as Forbenious norm(Appendix \ref{eq:fn}) of Error Matrix($\mathbf{E}$).
+\begin{gather*}
+\mathbf{E} = \mathbf{T} - \mathbf{XW}\\
+\tcbhighmath[drop fuzzy shadow]{J(\mathbf{W}) = \frac{1}{2}||\mathbf{E}||^2_{F}}
+\end{gather*}
+We obtain optimal weights by differentiating and equation to zero.
+\begin{gather*}
+\frac{\partial J(\mathbf{W})}{\partial \mathbf{W}} = -\mathbf{X}^T\left(\mathbf{T} - \mathbf{XW}\right) = 0\\
+\implies \tcbhighmath[drop fuzzy shadow]{\mathbf{W}^* = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{T}}
+\end{gather*}
+Now we obtain stochastic gradient descent equations,
+\begin{gather*}
+\mathbf{W}_{(n+1)} = \mathbf{W}_{(n)} - \mathbf{\eta}\frac{\partial J(\mathbf{W})}{\partial \mathbf{W}}\\
+\tcbhighmath[drop fuzzy shadow]{\mathbf{W}_{(n+1)} = \mathbf{W}_{(n)} + \mathbf{\eta}\mathbf{X}^T\left(\mathbf{T} - \mathbf{XW}\right)}
+\end{gather*}
+Using taylor series we find optimal $\eta$,
+\begin{gather*}
+J(\mathbf{W} + \Delta \mathbf{W}) = J(\mathbf{W}) + \Delta \mathbf{W}^T {\nabla}J(\mathbf{W}) + \frac{1}{2} \Delta \mathbf{W}^T {\nabla}^2J(\mathbf{W})\Delta \mathbf{W}\\
+\frac{\partial J(\mathbf{W} + \Delta \mathbf{W})}{\partial \Delta \mathbf{W}} = \mathbf{0} = {\nabla}J(\mathbf{W}) + {\nabla}^2J(\mathbf{W})\Delta \mathbf{W} \\
+\implies \tcbhighmath[drop fuzzy shadow]{\Delta \mathbf{W}^* = -({\nabla}^2J(\mathbf{W}))^2{\nabla}J(\mathbf{W})}\\
+\implies \tcbhighmath[drop fuzzy shadow]{{\eta}^* = (\mathbf{X}^T\mathbf{X})^{-1}}
+\end{gather*}
+\section*{\hfil Appendix}
+
+\subsection*{HW1 implementation}
+\begin{lstlisting}[caption={Python implementation of steepest decent algorithm with optimal $\eta$} ,language=python, label={code:hw1}] 
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -114,7 +207,7 @@ def steepest_decent(t, X, w, eta):
 	else:
 		return w + eta*(X.T@(t-X@w))
 
-tolerance = 1e-3
+tolerance = 1e-6
 def converged(w_old, w_new, tolerance):
 	x = np.linalg.norm(w_old-w_new)/np.linalg.norm(w_old)
 	return x <= tolerance
@@ -178,9 +271,8 @@ ax.legend()
 plt.show()
 \end{lstlisting}
 
-\section*{\hfil HW-2}
-Suppose you are experimenting with L1 and L2 regularization. Further imagine that you are running gradient descent and at some iteration your weight vector is $\overline{w}$ = [1, $\epsilon$] $\in$ $R^2$ where $\epsilon > 0$ is very small. With the help of this example explain why L2 norm does not encourage sparsity i.e., it will not try to drive $\epsilon$ to 0 to produce a sparse weight vector. Give mathematical explanation.
-
-\section*{\hfil HW-3}
-Till now we have been considering a scalar target t from a vector of input observations $\overline{x}$. How do you extend this approach for regressing a vector of targets $\overline{t} = (t1, t2, ..., tp)$. Derive the close form solutions and write sequential update equations using SGD.
+\subsection*{Frobenius norm}
+\begin{equation} \label{eq:fn}
+	||\mathbf{A}||_{F} = \sqrt{\sum_{i=1}^N\sum_{j=1}^{M}A^2_{ij}}
+\end{equation}
 \end{document}
