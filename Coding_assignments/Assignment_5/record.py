@@ -5,11 +5,11 @@ chunk = 1024  # Record in chunks of 1024 samples
 sample_format = pyaudio.paInt16  # 16 bits per sample
 channels = 1
 fs = 16000  # Record at 44100 samples per second
-seconds = 3
+seconds = 1
 
 utter = "nine"
 
-filename = "./data/"+ utter + "_{}.wav"
+filename = "./data1/"+ utter + "_{}.wav"
 j = 0
 data = input("Start :== ")
 while data:
