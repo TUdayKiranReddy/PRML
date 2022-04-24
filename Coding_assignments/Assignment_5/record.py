@@ -10,7 +10,7 @@ seconds = 1
 utter = "nine"
 
 filename = "./data1/"+ utter + "_{}.wav"
-j = 0
+j = 4
 data = input("Start :== ")
 while data:
     if data == "q":
